@@ -97,7 +97,8 @@ class JSONWebTokenLoginHandler(BaseHandler):
             logr = open('app.log', 'a')
             exceptions = print_exception()
             logr.write(f"Failed to load: {str(exceptions)}\n")
-            raise web.HTTPError(422)
+            # raise web.HTTPError(422)
+            raise web.HTTPError(417)
 
     def auth_failed(self, redirect_url):
         if redirect_url:
