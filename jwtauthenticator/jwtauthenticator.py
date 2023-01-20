@@ -157,8 +157,8 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 next_url = self.get_argument('next', default=False)
                 log_text('next:' + str(next_url))
                 log_text('_url:' + str(_url))
-                # if next_url:
-                #     _url = next_url
+                if next_url:
+                    _url = next_url
                 #     if param_name:
                 #         auth_param_content = parse.parse_qs(parse.urlparse(next_url).query).get(param_name, "")
                 #         if isinstance(auth_param_content, list):
