@@ -25,7 +25,7 @@ def print_exception():
 
 # import logging
 # logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-logf = open("app.log", "w")
+# logf = open("app.log", "a")
 
 
 class JSONWebTokenLoginHandler(BaseHandler):
@@ -94,8 +94,9 @@ class JSONWebTokenLoginHandler(BaseHandler):
 
             self.redirect(_url)
         except Exception as e:
+            logr = open('app.log', 'a')
             exceptions = print_exception()
-            logf.write(f"Failed to load: {exceptions}\n")
+            logr.write(f"Failed to load: {str(exceptions)}\n")
             raise web.HTTPError(422)
 
     def auth_failed(self, redirect_url):
