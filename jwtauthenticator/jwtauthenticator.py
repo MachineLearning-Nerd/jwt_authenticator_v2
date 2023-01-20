@@ -122,13 +122,13 @@ class JSONWebTokenLoginHandler(BaseHandler):
         try:
             try:
                 param_name = self.authenticator.param_name
-            except:
+            except Exception as e:
                 raise web.HTTPError(402)
 
 
             try:
                 auth_param_content = self.get_argument(param_name, default="") if param_name else None
-            except:
+            except Exception as e:
                 raise web.HTTPError(403)
 
             try:
@@ -136,7 +136,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 algorithms = self.authenticator.algorithms
                 username_claim_field = self.authenticator.username_claim_field
                 audience = self.authenticator.expected_audience
-            except:
+            except Exception as e:
                 raise web.HTTPError(404)
 
             try:
@@ -148,7 +148,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
                         auth_param_content = parse.parse_qs(parse.urlparse(next_url).query).get(param_name, "")
                         if isinstance(auth_param_content, list):
                             auth_param_content = auth_param_content[0]
-            except:
+            except Exception as e:
                 raise web.HTTPError(405)
 
             try:
@@ -156,7 +156,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
                     token = auth_param_content
                 else:
                     raise Exception('Error')
-            except:
+            except Exception as e:
                 raise web.HTTPError(407)
 
             try:
@@ -169,15 +169,15 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 username = self.retrieve_username(claims, username_claim_field, extract_username=False)
                 user = await self.auth_to_user({'name': username})
                 self.set_login_cookie(user)
-            except:
+            except Exception as e:
                 raise web.HTTPError(408)
 
             try:
                 self.redirect(_url)
-            except:
+            except Exception as e:
                 raise web.HTTPError(409)
         except Exception as e:
-            raise
+            raise web.HTTPError(417)
 
     def auth_failed(self, redirect_url):
         if redirect_url:
