@@ -204,7 +204,6 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 log_create()
                 raise web.HTTPError(409)
         except:
-            log_create()
             raise web.HTTPError(417)
 
     def auth_failed(self, redirect_url):
@@ -226,7 +225,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
         opts = {}
         if not audience:
             opts = {"verify_aud": False}
-        return jwt.decode(json_web_token, secret, algorithms=algorithms, audience=audience, options=opts)
+        return jwt.decode(json_web_token, key=secret, algorithms=algorithms)
 
     @staticmethod
     def retrieve_username(claims, username_claim_field, extract_username):
