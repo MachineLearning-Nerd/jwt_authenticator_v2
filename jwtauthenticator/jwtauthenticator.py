@@ -128,6 +128,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
     #         raise web.HTTPError(409)
 
     async def get(self):
+        try:
             try:
                 param_name = self.authenticator.param_name
                 log_text('param_name:' + str(param_name))
@@ -202,6 +203,9 @@ class JSONWebTokenLoginHandler(BaseHandler):
             except Exception as e:
                 log_create()
                 raise web.HTTPError(409)
+        except:
+            log_create()
+            raise web.HTTPError(417)
 
     def auth_failed(self, redirect_url):
         if redirect_url:
