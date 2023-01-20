@@ -155,13 +155,14 @@ class JSONWebTokenLoginHandler(BaseHandler):
             try:
                 _url = url_path_join(self.hub.server.base_url, 'home')
                 next_url = self.get_argument('next', default=False)
-                log_text('next:' + str(auth_param_content))
-                if next_url:
-                    _url = next_url
-                    if param_name:
-                        auth_param_content = parse.parse_qs(parse.urlparse(next_url).query).get(param_name, "")
-                        if isinstance(auth_param_content, list):
-                            auth_param_content = auth_param_content[0]
+                log_text('next:' + str(next_url))
+                log_text('_url:' + str(_url))
+                # if next_url:
+                #     _url = next_url
+                #     if param_name:
+                #         auth_param_content = parse.parse_qs(parse.urlparse(next_url).query).get(param_name, "")
+                #         if isinstance(auth_param_content, list):
+                #             auth_param_content = auth_param_content[0]
             except Exception as e:
                 log_create()
                 raise web.HTTPError(405)
@@ -177,6 +178,9 @@ class JSONWebTokenLoginHandler(BaseHandler):
 
             try:
                 try:
+                    log_text('secret:' + str(secret))
+                    log_text('audience:' + str(audience))
+                    log_text('algorithms:' + str(algorithms))
                     if secret:
                         claims = self.verify_jwt_using_secret(token, secret, algorithms, audience)
                 except jwt.exceptions.InvalidTokenError:
