@@ -119,7 +119,6 @@ class JSONWebTokenLoginHandler(BaseHandler):
     #         raise web.HTTPError(409)
 
     async def get(self):
-        try:
             try:
                 param_name = self.authenticator.param_name
             except Exception as e:
@@ -160,9 +159,12 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 raise web.HTTPError(407)
 
             try:
-                if secret:
-                    claims = self.verify_jwt_using_secret(token, secret, algorithms, audience)
-            except jwt.exceptions.InvalidTokenError:
+                try:
+                    if secret:
+                        claims = self.verify_jwt_using_secret(token, secret, algorithms, audience)
+                except jwt.exceptions.InvalidTokenError:
+                    raise web.HTTPError(406)
+            except Exception as e:
                 raise web.HTTPError(406)
 
             try:
@@ -176,8 +178,6 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 self.redirect(_url)
             except Exception as e:
                 raise web.HTTPError(409)
-        except Exception as e:
-            raise web.HTTPError(417)
 
     def auth_failed(self, redirect_url):
         if redirect_url:
