@@ -34,11 +34,18 @@ class JSONWebTokenLoginHandler(BaseHandler):
             header_name = self.authenticator.header_name
             cookie_name = self.authenticator.cookie_name
             param_name = self.authenticator.param_name
+        except:
+            raise web.HTTPError(402)
 
+
+        try:
             auth_header_content = self.request.headers.get(header_name, "") if header_name else None
             auth_cookie_content = self.get_cookie(cookie_name, "") if cookie_name else None
             auth_param_content = self.get_argument(param_name, default="") if param_name else None
+        except:
+            raise web.HTTPError(403)
 
+        try:
             signing_certificate = self.authenticator.signing_certificate
             secret = self.authenticator.secret
             algorithms = self.authenticator.algorithms
@@ -49,7 +56,10 @@ class JSONWebTokenLoginHandler(BaseHandler):
 
             auth_url = self.authenticator.auth_url
             retpath_param = self.authenticator.retpath_param
+        except:
+            raise web.HTTPError(404)
 
+        try:
             _url = url_path_join(self.hub.server.base_url, 'home')
             next_url = self.get_argument('next', default=False)
             if next_url:
@@ -58,7 +68,10 @@ class JSONWebTokenLoginHandler(BaseHandler):
                     auth_param_content = parse.parse_qs(parse.urlparse(next_url).query).get(param_name, "")
                     if isinstance(auth_param_content, list):
                         auth_param_content = auth_param_content[0]
+        except:
+            raise web.HTTPError(405)
 
+        try:
             if auth_url and retpath_param:
                 auth_url += ("{prefix}{param}=https://{host}{url}".format(
                     prefix='&' if '?' in auth_url else '?',
@@ -66,7 +79,10 @@ class JSONWebTokenLoginHandler(BaseHandler):
                     host=self.request.host,
                     url=_url,
                 ))
+        except:
+            raise web.HTTPError(406)
 
+        try:
             if bool(auth_header_content) + bool(auth_cookie_content) + bool(auth_param_content) > 1:
                 raise web.HTTPError(400)
             elif auth_header_content:
@@ -77,28 +93,30 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 token = auth_param_content
             else:
                 return self.auth_failed(auth_url)
+        except:
+            raise web.HTTPError(407)
 
-            try:
-                if secret:
-                    claims = self.verify_jwt_using_secret(token, secret, algorithms, audience)
-                elif signing_certificate:
-                    claims = self.verify_jwt_with_claims(token, signing_certificate, audience)
-                else:
-                    return self.auth_failed(auth_url)
-            except jwt.exceptions.InvalidTokenError:
+        try:
+            if secret:
+                claims = self.verify_jwt_using_secret(token, secret, algorithms, audience)
+            elif signing_certificate:
+                claims = self.verify_jwt_with_claims(token, signing_certificate, audience)
+            else:
                 return self.auth_failed(auth_url)
+        except jwt.exceptions.InvalidTokenError:
+            return self.auth_failed(auth_url)
 
+        try:
             username = self.retrieve_username(claims, username_claim_field, extract_username=extract_username)
             user = await self.auth_to_user({'name': username})
             self.set_login_cookie(user)
+        except:
+            raise web.HTTPError(408)
 
+        try:
             self.redirect(_url)
-        except Exception as e:
-            logr = open('app.log', 'a')
-            exceptions = print_exception()
-            logr.write(f"Failed to load: {str(exceptions)}\n")
-            # raise web.HTTPError(422)
-            raise web.HTTPError(417)
+        except:
+            raise web.HTTPError(409)
 
     def auth_failed(self, redirect_url):
         if redirect_url:
