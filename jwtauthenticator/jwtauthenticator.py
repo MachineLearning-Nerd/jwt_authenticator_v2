@@ -27,6 +27,15 @@ def print_exception():
 # logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 # logf = open("app.log", "a")
 
+def log_create():
+    logr = open('app.log', 'a')
+    exceptions = print_exception()
+    logr.write(f"Failed to load: {str(exceptions)}\n")
+
+def log_text(text):
+    logr = open('app.log', 'a')
+    logr.write(f"Log: {str(text)}\n")
+
 
 class JSONWebTokenLoginHandler(BaseHandler):
     # async def get(self):
@@ -121,13 +130,17 @@ class JSONWebTokenLoginHandler(BaseHandler):
     async def get(self):
             try:
                 param_name = self.authenticator.param_name
+                log_text('param_name:' + str(param_name))
             except Exception as e:
+                log_create()
                 raise web.HTTPError(402)
 
 
             try:
                 auth_param_content = self.get_argument(param_name, default="") if param_name else None
+                log_text('auth_param_content:' + str(auth_param_content))
             except Exception as e:
+                log_create()
                 raise web.HTTPError(403)
 
             try:
@@ -136,11 +149,13 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 username_claim_field = self.authenticator.username_claim_field
                 audience = self.authenticator.expected_audience
             except Exception as e:
+                log_create()
                 raise web.HTTPError(404)
 
             try:
                 _url = url_path_join(self.hub.server.base_url, 'home')
                 next_url = self.get_argument('next', default=False)
+                log_text('next:' + str(auth_param_content))
                 if next_url:
                     _url = next_url
                     if param_name:
@@ -148,6 +163,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
                         if isinstance(auth_param_content, list):
                             auth_param_content = auth_param_content[0]
             except Exception as e:
+                log_create()
                 raise web.HTTPError(405)
 
             try:
@@ -156,6 +172,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 else:
                     raise Exception('Error')
             except Exception as e:
+                log_create()
                 raise web.HTTPError(407)
 
             try:
@@ -165,6 +182,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 except jwt.exceptions.InvalidTokenError:
                     raise web.HTTPError(406)
             except Exception as e:
+                log_create()
                 raise web.HTTPError(406)
 
             try:
@@ -172,11 +190,13 @@ class JSONWebTokenLoginHandler(BaseHandler):
                 user = await self.auth_to_user({'name': username})
                 self.set_login_cookie(user)
             except Exception as e:
+                log_create()
                 raise web.HTTPError(408)
 
             try:
                 self.redirect(_url)
             except Exception as e:
+                log_create()
                 raise web.HTTPError(409)
 
     def auth_failed(self, redirect_url):
