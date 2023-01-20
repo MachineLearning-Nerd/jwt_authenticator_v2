@@ -14,8 +14,18 @@ from traitlets import (
 )
 from urllib import parse
 
-import logging
-logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+
+def print_exception():
+    import sys
+    import traceback
+    exc_type, exc_value, exc_tb = sys.exc_info()
+    except_string = traceback.format_exception(exc_type, exc_value, exc_tb)
+    print(except_string)
+    return except_string
+
+# import logging
+# logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+logf = open("app.log", "w")
 
 
 class JSONWebTokenLoginHandler(BaseHandler):
@@ -84,7 +94,8 @@ class JSONWebTokenLoginHandler(BaseHandler):
 
             self.redirect(_url)
         except Exception as e:
-            logging.info(str(e))
+            exceptions = print_exception()
+            logf.write(f"Failed to load: {exceptions}\n")
             raise web.HTTPError(422)
 
     def auth_failed(self, redirect_url):
