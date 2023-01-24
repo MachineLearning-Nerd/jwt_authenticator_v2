@@ -302,9 +302,11 @@ class JSONWebTokenAuthenticator(Authenticator):
     )
 
     def get_handlers(self, app):
-        return [
-            (r'/login', JSONWebTokenLoginHandler),
-        ]
+        try:
+            return [(r'/login', JSONWebTokenLoginHandler),]
+        except Exception as e:
+            log_create()
+            raise web.HTTPError(418)
 
     @gen.coroutine
     def authenticate(self, *args):
