@@ -184,6 +184,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
                     log_text('algorithms:' + str(algorithms))
                     if secret:
                         claims = self.verify_jwt_using_secret(token, secret, algorithms, audience)
+                        log_text('claims:' + str(claims))
                 except jwt.exceptions.InvalidTokenError:
                     raise web.HTTPError(406)
             except Exception as e:
@@ -192,7 +193,9 @@ class JSONWebTokenLoginHandler(BaseHandler):
 
             try:
                 username = self.retrieve_username(claims, username_claim_field, extract_username=False)
+                log_text('username:' + str(username))
                 user = await self.auth_to_user({'name': username})
+                log_text('user:' + str(user))
                 self.set_login_cookie(user)
             except Exception as e:
                 log_create()
