@@ -233,7 +233,7 @@ class JSONWebTokenLoginHandler(BaseHandler):
         if extract_username:
             if "@" in username:
                 return username.split("@")[0]
-        return username
+        return username.lower()
 
 
 class JSONWebTokenAuthenticator(Authenticator):
