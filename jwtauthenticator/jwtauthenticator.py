@@ -217,17 +217,13 @@ class JSONWebTokenLoginHandler(BaseHandler):
 
     @staticmethod
     def verify_jwt_with_claims(token, signing_certificate, audience):
-        opts = {}
-        if not audience:
-            opts = {"verify_aud": False}
+        opts = {"verify_aud": False}  # Always disable audience verification
         with open(signing_certificate, 'r') as rsa_public_key_file:
             return jwt.decode(token, rsa_public_key_file.read(), audience=audience, options=opts)
 
     @staticmethod
     def verify_jwt_using_secret(json_web_token, secret, algorithms, audience):
-        opts = {}
-        if not audience:
-            opts = {"verify_aud": False}
+        opts = {"verify_aud": False} # Always disable audience verification
         return jwt.decode(json_web_token, key=secret, algorithms=algorithms)
 
     @staticmethod
